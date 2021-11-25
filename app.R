@@ -311,7 +311,8 @@ reset_history <- function(){
             h4("Swipe Me! Or use the arrows"),
             p("Swipe the plot to the right if the time profile is interesting. Left if not."),
             p("za vir podatkov jemlje datoteko, katere povezava je shranjena na vrhu v spremenljivki link!!"),
-            p(paste(historyfile, link, sqlitePath)),
+            p(paste("Source: ", link)),
+            p(paste("Saving responses into: ", historyfile)),
             hr(),
             fluidRow(
                 column(2, actionButton(inputId = "buttonLeft", label = "boring", icon = icon("arrow-left") ), align = "left", offset = 3),

@@ -8,7 +8,7 @@ library(stats)
 indind <- ""
 historyfile <-  paste("./data/SwipeHistory",indind, ".sqlite", sep="")                                          
 #zapis zgodovine rezultatov
-link <-  paste( "./data/shinyPosData",indind,".txt", sep="")
+link <-  paste( "./data/python_out",indind,".csv", sep="")
 sqlitePath <- "swiperespons.sqlite"
 xtraVar <- 8 
 nswipeReward = 25
@@ -330,7 +330,7 @@ reset_history <- function(){
         
     ),
     hr(),
-    print("Made by Charlie Beirnaert. Having Problems? The solution is just an email away... hopefully." )
+    print("Made by Charlie Beirnaert, modified by Martin Rafael Gulin" )
     
 )
 }
@@ -416,6 +416,8 @@ server <- function(input, output, session) {
         time <- as.numeric(unlist(lapply(strsplit(colnames(dataSet()[,start:end]), "_"), `[[`, 2)))                #Iz colnames vzame ime produkta in čas --> tabela more bit poimenovana XYZ_time
         type <- as.factor(unlist(lapply(strsplit(colnames(dataSet()[,start:end]), "_"), `[[`, 1)))
         Group <- as.character(type)
+        print(time)
+        print(type)
         Group[Group %in% c("S1", "S2", "S3")] <- "S"                                                               #podobnim skupinam priredi isto vrsto
         Group <- as.factor(Group)
         kk <- selection.vector()[as.numeric(appVals$k)]                                                            #appVals$k se mi zdi da je spremenljivka, ki pove katera vrstica je trenutna (id produkta?), iter v saveData()

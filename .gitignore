@@ -1,3 +1,8 @@
+# SwipeHistory
+.data/SwipeHistory.sqlite
+.swiperesponses.sqlite
+
+
 # History files
 .Rhistory
 .Rapp.history

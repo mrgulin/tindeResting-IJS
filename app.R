@@ -8,9 +8,9 @@ library(stats)
 indind <- ""
 historyfile <-  paste("./data/SwipeHistory",indind, ".sqlite", sep="")                                          
 #zapis zgodovine rezultatov
-link <-  paste( "./data/python_out",indind,".csv", sep="")
+link <-  paste( "./data/shinyPosData",indind,".txt", sep="")
 sqlitePath <- "swiperespons.sqlite"
-xtraVar <- 8 
+xtraVar <- 9 
 nswipeReward = 25
 maxmz <- 600
 baselinemin <- 0.1
@@ -308,9 +308,7 @@ reset_history <- function(){
             
         ),
         mainPanel(
-            h4("Swipe Me! Or use the arrows"),
             p("Swipe the plot to the right if the time profile is interesting. Left if not."),
-            p("za vir podatkov jemlje datoteko, katere povezava je shranjena na vrhu v spremenljivki link!!"),
             p(paste("Source: ", link)),
             p(paste("Saving responses into: ", historyfile)),
             hr(),
@@ -330,7 +328,7 @@ reset_history <- function(){
         
     ),
     hr(),
-    print("Made by Charlie Beirnaert, modified by Martin Rafael Gulin" )
+    p("Made by Charlie Beirnaert, modified by Martin Rafael Gulin" )
     
 )
 }

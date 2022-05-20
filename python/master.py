@@ -63,6 +63,7 @@ class GenerateList:
         data = [i.replace("_", ".") for i in data]
         data = [i.strip().split(",")[:-1] for i in data]
         data[0] = [i.replace(".mzdata.xml Peak height", "") for i in data[0]]
+        data[0] = [i.replace(".RAW PEAK HEIGHT", "") for i in data[0]]
         data[0] = [i.replace(".mzdata.xml Peak area", "") for i in data[0]]
         for i in range(len(data)):
             data[i] = data[i][0:3] + ['0', '0', '0', '0', '0'] + data[i][3:]
@@ -82,22 +83,35 @@ class GenerateList:
                         self.column_index_dict[key1][key2]['parallel'] = []
                 for col_name in tup_name:
                     for i, col_name_text in enumerate(self.header):
-                        split = col_name_text.split("-")
+                        split = col_name_text.split(".")
                         if col_name in col_name_text:
                             self.column_index_dict[key1][key2]['index'].append(i)
                             self.column_index_dict[key1][key2]['name'].append(col_name_text)
-                            self.column_index_dict[key1][key2]['aliquot'].append(
-                                split[-1])  # watch out: name based algorithm!
-                            self.column_index_dict[key1][key2]['time'].append(transform_time(split[-2]))
                             if key2 == "SAMPLE":
-                                self.column_index_dict[key1][key2]['parallel'].append(split[1])
+                                common_name = split[0]
+                                self.column_index_dict[key1][key2]['aliquot'].append(
+                                    split[-1])  # watch out: name based algorithm!
+                                self.column_index_dict[key1][key2]['time'].append(round(transform_time(split[-2])))
+                                self.column_index_dict[key1][key2]['parallel'].append(0)
+                            elif key2 == "BLANK":
+                                common_name = split[0]
+                                self.column_index_dict[key1][key2]['aliquot'].append(
+                                    split[-1])  # watch out: name based algorithm!
+                                self.column_index_dict[key1][key2]['time'].append('X')
+                            elif key2 == "CONTROL":
+                                common_name = split[0][:-1]
+                                self.column_index_dict[key1][key2]['aliquot'].append(col_name_text[-1])
+                                self.column_index_dict[key1][key2]['time'].append('X')
+                            temp_dir = self.column_index_dict[key1][key2]
+                            self.header[temp_dir['index'][-1]] = f"{common_name}_{temp_dir['aliquot'][-1]}_{temp_dir['time'][-1]}"
+
 
         first_row_updated = self.header.copy()
-        for i in range(self.extra_vars, len(self.header)):
-            split = self.header[i].split("-")
-            time = split[-2]
-            split.remove(split[-2])
-            first_row_updated[i] = "-".join(split) + "_" + time
+        # for i in range(self.extra_vars, len(self.header)):
+        #     split = self.header[i].split(".")
+        #     time = split[-2]
+        #     split.remove(split[-2])
+        #     first_row_updated[i] = "-".join(split) + "_" + time
 
         self.new_header = np.array(first_row_updated)
 
@@ -186,8 +200,12 @@ class GenerateList:
             exp_header = self.grouped_table_header
             exp_table = self.grouped_table
         else:
-            exp_header = self.new_header
-            exp_table = self.table
+            correct_index = list(range(self.extra_vars))
+            for key1, val1 in self.column_index_dict.items():
+                for key2, val2 in val1.items():
+                    correct_index.extend(val2['index'])
+            exp_header = np.array(self.new_header)[correct_index]
+            exp_table = np.array(self.table)[:, correct_index]
         with open(self.out_link + '.csv', 'w') as outfile:  # also, tried mode="rb"
             outfile.write(','.join(str(v) for v in exp_header)+"\n")
             for s in exp_table:
@@ -199,9 +217,9 @@ class GenerateList:
         self.get_sample_names()
         self.calculate_ratios()
         self.sort_columns()
-        self.group_aliquots()
-        self.average_aliquots()
-        self.export_table(True)
+        # self.group_aliquots()
+        # self.average_aliquots()
+        self.export_table(False)
 
 
 '''header, table = get_table("Mzinput/BPF_mz_Strict.csv")

@@ -73,6 +73,7 @@ class GenerateList:
         self.header = data[0]
 
     def get_sample_names(self):
+        temp_header = self.header.copy()
         for key1, dict1 in self.parameter_list.items():
             if key1 not in self.column_index_dict:
                 self.column_index_dict[key1] = dict()
@@ -99,12 +100,17 @@ class GenerateList:
                                     split[-1])  # watch out: name based algorithm!
                                 self.column_index_dict[key1][key2]['time'].append('X')
                             elif key2 == "CONTROL":
-                                common_name = split[0][:-1]
-                                self.column_index_dict[key1][key2]['aliquot'].append(col_name_text[-1])
-                                self.column_index_dict[key1][key2]['time'].append('X')
+                                if "BP" in col_name_text:
+                                    common_name = "CONTROL_" + split[0]
+                                    self.column_index_dict[key1][key2]['aliquot'].append(col_name_text[-1])
+                                    self.column_index_dict[key1][key2]['time'].append('X')
+                                else:
+                                    common_name = split[0][:-1]
+                                    self.column_index_dict[key1][key2]['aliquot'].append(col_name_text[-1])
+                                    self.column_index_dict[key1][key2]['time'].append('X')
                             temp_dir = self.column_index_dict[key1][key2]
-                            self.header[temp_dir['index'][-1]] = f"{common_name}_{temp_dir['aliquot'][-1]}_{temp_dir['time'][-1]}"
-
+                            temp_header[temp_dir['index'][-1]] = f"{common_name}_{temp_dir['aliquot'][-1]}_{temp_dir['time'][-1]}"
+        self.header = temp_header
 
         first_row_updated = self.header.copy()
         # for i in range(self.extra_vars, len(self.header)):
@@ -203,6 +209,8 @@ class GenerateList:
             correct_index = list(range(self.extra_vars))
             for key1, val1 in self.column_index_dict.items():
                 for key2, val2 in val1.items():
+                    if key2 == "CONTROL" and len([i for i in val2['name'] if 'BP' not in i])==0:
+                        continue
                     correct_index.extend(val2['index'])
             exp_header = np.array(self.new_header)[correct_index]
             exp_table = np.array(self.table)[:, correct_index]

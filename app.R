@@ -425,27 +425,27 @@ server <- function(input, output, session) {
         predVal <- as.character(round(1000*datasubset$predictVal[kk])/1000)
         plotname <-  paste("mz:", MZplot, "  RT:",  RTplot, "min, predicted value: ", predVal , sep = " ")
         gg1 <- ggplot(compoundData[!is.na(compoundData$t),], aes(x=t,y=int,group = full_name, colour = types)) +
-            geom_line() +
+            geom_line(alpha=0.7, size=1) +
             geom_segment(data= compoundData[is.na(compoundData$t),], 
-                         aes(x = 0, y = int, xend = 480, yend = int, col = factor(types)))+
+                         aes(x = 0, y = int, xend = 480, yend = int, col = factor(types)), alpha=0.7, size=1)+
             geom_hline(yintercept=1000)+
             ggtitle(plotname) +
-            theme_bw()+
-            scale_color_manual(values = c("black","green","red","gray50"))+
+            theme_bw(base_size = 15)+
+            scale_color_manual(values = c("black","darkgreen","darkred","gray50"))+
             theme(panel.grid.major = element_line(colour="gray70", size=0.5)) +
             # scale_x_continuous(breaks = c(0, 3,5,6,7,8,9,10,11,12,13,14,15,16,17,18), minor_breaks =c())+
             theme(plot.title = element_text(hjust = 0.5),
                   legend.position="bottom")
         
         gg2 <- ggplot(compoundData[!is.na(compoundData$t),], aes(x=t,y=log10(int+1),group = full_name, colour = types)) +                     #graf log10(x+1), da ni -neskončno ampak 0. Mogoče bi se bolj splačalo popraviti na nekaj manjšega?
-            geom_line()+
+            geom_line(alpha=0.7, size=1)+
             
             ggtitle(" ") +
-            theme_bw() +
-            scale_color_manual(values = c("black","green","red","gray50"))+
-            theme(panel.grid.minor = element_line(colour="gray", size=0.5)) +
+            theme_bw(base_size = 15) +
+            scale_color_manual(values = c("black","darkgreen","darkred","gray50"))+
+            theme(panel.grid.minor = element_line(colour="gray80", size=0.5)) +
             geom_segment(data= compoundData[is.na(compoundData$t),], 
-                         aes(x = 0, y = log10(int+1), xend = 480, yend = log10(int+1), col = factor(types)))+
+                         aes(x = 0, y = log10(int+1), xend = 480, yend = log10(int+1), col = factor(types)), alpha=0.7, size=1)+
             # scale_x_continuous(minor_breaks = c(0, 3,5,6,7,8,9,10,11,12,13,14,15,16,17,18))+
             theme(plot.title = element_text(hjust = 0.5),
                   legend.position="bottom")

@@ -64,6 +64,7 @@ class GenerateList:
         data = [i.strip().split(",")[:-1] for i in data]
         data[0] = [i.replace(".mzdata.xml Peak height", "") for i in data[0]]
         data[0] = [i.replace(".RAW PEAK HEIGHT", "") for i in data[0]]
+        data[0] = [i.replace("DAY", "") for i in data[0]]
         data[0] = [i.replace(".mzdata.xml Peak area", "") for i in data[0]]
         for i in range(len(data)):
             data[i] = data[i][0:3] + ['0', '0', '0', '0', '0'] + data[i][3:]
@@ -72,7 +73,7 @@ class GenerateList:
         self.table = np.array(data[1:], dtype=float)
         self.header = data[0]
 
-    def get_sample_names(self):
+    def get_sample_names(self, tmbpf=False):
         temp_header = self.header.copy()
         for key1, dict1 in self.parameter_list.items():
             if key1 not in self.column_index_dict:
@@ -90,20 +91,35 @@ class GenerateList:
                             self.column_index_dict[key1][key2]['name'].append(col_name_text)
                             if key2 == "SAMPLE":
                                 common_name = split[0]
-                                self.column_index_dict[key1][key2]['aliquot'].append(
-                                    split[-1])  # watch out: name based algorithm!
-                                self.column_index_dict[key1][key2]['time'].append(round(transform_time(split[-2])))
-                                self.column_index_dict[key1][key2]['parallel'].append(0)
+                                if tmbpf == 'TMBPF':
+                                    self.column_index_dict[key1][key2]['aliquot'].append(
+                                        split[-2][1])  # watch out: name based algorithm!
+                                    self.column_index_dict[key1][key2]['time'].append(round(transform_time(split[-1])))
+                                    self.column_index_dict[key1][key2]['parallel'].append(0)
+                                else:
+                                    self.column_index_dict[key1][key2]['aliquot'].append(
+                                        split[-1])  # watch out: name based algorithm!
+                                    self.column_index_dict[key1][key2]['time'].append(round(transform_time(split[-2])))
+                                    self.column_index_dict[key1][key2]['parallel'].append(0)
                             elif key2 == "BLANK":
                                 common_name = split[0]
-                                self.column_index_dict[key1][key2]['aliquot'].append(
-                                    split[-1])  # watch out: name based algorithm!
-                                self.column_index_dict[key1][key2]['time'].append('X')
+                                if tmbpf == 'TMBPF':
+                                    self.column_index_dict[key1][key2]['aliquot'].append(1)
+                                    self.column_index_dict[key1][key2]['time'].append(
+                                        split[-1])
+                                else:
+                                    self.column_index_dict[key1][key2]['aliquot'].append(
+                                        split[-1])  # watch out: name based algorithm!
+                                    self.column_index_dict[key1][key2]['time'].append('X')
                             elif key2 == "CONTROL":
                                 if "BP" in col_name_text:
-                                    common_name = "CONTROL_" + split[0]
-                                    self.column_index_dict[key1][key2]['aliquot'].append(col_name_text[-1])
-                                    self.column_index_dict[key1][key2]['time'].append('X')
+                                    common_name = "CONTROL-" + split[0]
+                                    if tmbpf == "TMBPF":
+                                        self.column_index_dict[key1][key2]['aliquot'].append(split[-2][1])
+                                        self.column_index_dict[key1][key2]['time'].append('X')
+                                    else:
+                                        self.column_index_dict[key1][key2]['aliquot'].append(col_name_text[-1])
+                                        self.column_index_dict[key1][key2]['time'].append('X')
                                 else:
                                     common_name = split[0][:-1]
                                     self.column_index_dict[key1][key2]['aliquot'].append(col_name_text[-1])
@@ -158,7 +174,7 @@ class GenerateList:
                     ind = np.lexsort((subdict['aliquot'], subdict['time'], subdict['parallel']))
                 else:
                     ind = np.lexsort((subdict['aliquot'], subdict['time']))
-                [subdict['aliquot'][i] + ", " + str(self.column_index_dict[key1][key2]['time'][i]) for i in ind]
+                [str(subdict['aliquot'][i]) + ", " + str(self.column_index_dict[key1][key2]['time'][i]) for i in ind]
                 subdict['index'] = subdict['index'][ind]
                 subdict['name'] = subdict['name'][ind]
                 subdict['aliquot'] = subdict['aliquot'][ind]
@@ -220,9 +236,9 @@ class GenerateList:
                 s = ','.join(str(v) for v in s)
                 outfile.write("%s\n" % s)
 
-    def merged_algorithm(self):
+    def merged_algorithm(self, sample_type=False):
         self.get_table()
-        self.get_sample_names()
+        self.get_sample_names(sample_type)
         self.calculate_ratios()
         self.sort_columns()
         # self.group_aliquots()

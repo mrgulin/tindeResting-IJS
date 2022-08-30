@@ -5,11 +5,9 @@ library(stats)
 
 
 
-indind <- ""
-historyfile <-  paste("./data/SwipeHistory",indind, ".sqlite", sep="")                                          
-#zapis zgodovine rezultatov
-link <-  paste( "./data/MzMine_Output_PlasmaBPA_Project1_New_gapFill_out",indind,".csv", sep="")
-sqlitePath <- "swiperespons.sqlite"
+historyfile <-  paste("./data/SwipeHistory_TMBPF_A.sqlite", sep="")                                          
+link <-  paste( "./data/TMBPF_A_v1.csv", sep="")
+
 xtraVar <- 9 
 nswipeReward = 25
 maxmz <- 600
@@ -18,7 +16,7 @@ baselinemin <- 0.1
 
 source("arrangeGrobLocal.R")   #TA DVA FILA STA SAMO ZA RAZPOREDITEV PLOTOV VZPOREDNO!, nista bistvena za razumevanje delovanja kode
 source("grid.arrangeLocal.R")
-
+sqlitePath <- "swiperespons.sqlite"
 
 
 appDataUpdater <- function(historyfile,sqlitePath ){
@@ -395,8 +393,8 @@ server <- function(input, output, session) {
         ggplot(dataSet(), aes(x = qSvsMB, y = qSvsNC, colour = as.factor(dataSubset()))) +
             geom_point() +
             labs(colour="Selected",
-                 x = "q value. S vs MB",
-                 y= "q value. S vs NC") +
+                 x = "starting concentration / average concentration",
+                 y= "average blank / average concentration") +
             ggtitle(paste(as.character(sum(dataSubset()))," Features Selected", sep ="")) +
             theme(plot.title = element_text(hjust = 0.5))+
             coord_cartesian(xlim=c(0,1), ylim=c(0,1))
@@ -426,29 +424,36 @@ server <- function(input, output, session) {
         plotname <-  paste("mz:", MZplot, "  RT:",  RTplot, "min, predicted value: ", predVal , sep = " ")
         gg1 <- ggplot(compoundData[!is.na(compoundData$t),], aes(x=t,y=int,group = full_name, colour = types)) +
             geom_line(alpha=0.7, size=1) +
-            geom_segment(data= compoundData[is.na(compoundData$t),], 
-                         aes(x = 0, y = int, xend = 480, yend = int, col = factor(types)), alpha=0.7, size=1)+
             geom_hline(yintercept=1000)+
             ggtitle(plotname) +
             theme_bw(base_size = 15)+
-            scale_color_manual(values = c("black","darkgreen","darkred","gray50"))+
+            scale_color_manual(values = c("darkred","darkgreen","black","gray50"))+
             theme(panel.grid.major = element_line(colour="gray70", size=0.5)) +
             # scale_x_continuous(breaks = c(0, 3,5,6,7,8,9,10,11,12,13,14,15,16,17,18), minor_breaks =c())+
             theme(plot.title = element_text(hjust = 0.5),
                   legend.position="bottom")
-        
+
         gg2 <- ggplot(compoundData[!is.na(compoundData$t),], aes(x=t,y=log10(int+1),group = full_name, colour = types)) +                     #graf log10(x+1), da ni -neskončno ampak 0. Mogoče bi se bolj splačalo popraviti na nekaj manjšega?
             geom_line(alpha=0.7, size=1)+
             
             ggtitle(" ") +
             theme_bw(base_size = 15) +
-            scale_color_manual(values = c("black","darkgreen","darkred","gray50"))+
+            scale_color_manual(values = c("darkred","darkgreen","black","gray50"))+
             theme(panel.grid.minor = element_line(colour="gray80", size=0.5)) +
-            geom_segment(data= compoundData[is.na(compoundData$t),], 
-                         aes(x = 0, y = log10(int+1), xend = 480, yend = log10(int+1), col = factor(types)), alpha=0.7, size=1)+
             # scale_x_continuous(minor_breaks = c(0, 3,5,6,7,8,9,10,11,12,13,14,15,16,17,18))+
             theme(plot.title = element_text(hjust = 0.5),
                   legend.position="bottom")
+
+        if (nrow(compoundData[is.na(compoundData$t),]) != 0){
+            gg1 <- gg1 + 
+                geom_segment(data= compoundData[is.na(compoundData$t),],
+                             aes(x = 0, y = int, xend = 480, yend = int, col = factor(types)), alpha=0.7, size=1)
+            gg2 <- gg2 + 
+                geom_segment(data= compoundData[is.na(compoundData$t),],
+                             aes(x = 0, y = log10(int+1), xend = 480, yend = log10(int+1), col = factor(types)), alpha=0.7, size=1)
+                
+        }
+        
         grid.arrangeLocal(gg1,gg2, layout_matrix = rbind(c(1,1,2),c(1,1,2),c(1,1,2)))
         
    

@@ -2,7 +2,10 @@
 .data/SwipeHistory.sqlite
 .swiperesponses.sqlite
 .data/
-.mini_grid_graphs/
+/mini_grid_graphs/
+/python/Mzinput/
+/data/
+/idea/
 
 
 # History files

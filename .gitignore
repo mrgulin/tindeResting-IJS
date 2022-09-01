@@ -1,11 +1,15 @@
 # SwipeHistory
 .data/SwipeHistory.sqlite
 .swiperesponses.sqlite
+.data/
+.mini_grid_graphs/
 
 
 # History files
 .Rhistory
 .Rapp.history
+swiperespons.sqlite
+*logger.log
 
 # Session Data files
 .RData
@@ -43,4 +47,4 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-data/SwipeHistory.sqlite
+

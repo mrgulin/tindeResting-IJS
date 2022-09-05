@@ -104,6 +104,7 @@ class GenerateList:
                             elif key2 == "BLANK":
                                 common_name = split[0]
                                 if tmbpf == 'TMBPF':
+                                    common_name = 'BLANK'
                                     self.column_index_dict[key1][key2]['aliquot'].append(1)
                                     self.column_index_dict[key1][key2]['time'].append(
                                         split[-1])

@@ -18,7 +18,7 @@ if __name__ == "__main__":
     # )
 
     # condition A
-    if True:
+    if False:
         p_l = {"TMBPF": {"BLANK": ("BLANK.A",), "CONTROL": ("TMBPF.A1.0", "TMBPF.A2.0", "TMBPF.A3.0"),
                          "SAMPLE": ("TMBPF.A1","TMBPF.A2", "TMBPF.A3")}}
         tmbpf_a = master.GenerateList("Mzinput/tmbpf/tmbpf_samples_SampleA_massfeatures_ms2.csv", p_l,
@@ -26,8 +26,8 @@ if __name__ == "__main__":
         tmbpf_a.merged_algorithm('TMBPF')
 
     # condition D
-    if False:
-        p_l = {"TMBPF": {"BLANK": ("BLANK.D",), "CONTROL": ("TMBPF.D1.0", "TMBPF.D2.0", "TMBPF.D3.0"),
+    if True:
+        p_l = {"TMBPF": {"BLANK": ("TMBPF.BLANK.D",), "CONTROL": ("TMBPF.D1.0", "TMBPF.D2.0", "TMBPF.D3.0"),
                          "SAMPLE": ("TMBPF.D1","TMBPF.D2", "TMBPF.D3")}}
         tmbpf_a = master.GenerateList("Mzinput/tmbpf/tmbpf_samples_SampleD_massfeatures_ms2.csv", p_l,
                                    "../data/TMBPF_D_v1")
